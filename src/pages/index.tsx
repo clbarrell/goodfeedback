@@ -22,14 +22,14 @@ type FeedbackResponse = {
 };
 
 export default function Home() {
-  const input = useRef(null);
+  const input = useRef<HTMLInputElement>();
   const [feedback, setFeedback] = useState("");
   const [submittedFeedback, setSubmittedFeedback] = useState(false);
   const [response, setResponse] = useState<FeedbackResponse | null>(null);
   const [waitingOnResponse, setwaitingOnResponse] = useState(false);
 
   useEffect(() => {
-    if (input != null) {
+    if (input.current != undefined) {
       input.current.focus();
     }
   }, []);
