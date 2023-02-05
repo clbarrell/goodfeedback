@@ -1,11 +1,81 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from '@/styles/Home.module.css'
+import {
+  Box,
+  Button,
+  Container,
+  Heading,
+  Input,
+  List,
+  ListItem,
+  Stack,
+  Text,
+  Textarea,
+  UnorderedList,
+} from "@chakra-ui/react";
+import Head from "next/head";
+import { useEffect, useRef, useState } from "react";
 
-const inter = Inter({ subsets: ['latin'] })
+type FeedbackResponse = {
+  category: string;
+  included: string;
+  missing: string;
+  description: string;
+};
 
 export default function Home() {
+  const input = useRef(null);
+  const [feedback, setFeedback] = useState("");
+  const [submittedFeedback, setSubmittedFeedback] = useState(false);
+  const [response, setResponse] = useState<FeedbackResponse | null>(null);
+  const [waitingOnResponse, setwaitingOnResponse] = useState(false);
+
+  useEffect(() => {
+    if (input != null) {
+      input.current.focus();
+    }
+  }, []);
+
+  const handleSubmit = () => {
+    // setResponse("");
+    setSubmittedFeedback(true);
+    onSubmit();
+  };
+
+  const handleReset = () => {
+    setSubmittedFeedback(false);
+    input.current.focus();
+    setFeedback("");
+  };
+
+  async function onSubmit() {
+    try {
+      setwaitingOnResponse(true);
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ feedback: feedback }),
+      });
+
+      const data = await response.json();
+      if (response.status !== 200) {
+        throw (
+          data.error ||
+          new Error(`Request failed with status ${response.status}`)
+        );
+      }
+
+      console.log(JSON.parse(data.result));
+      setResponse(JSON.parse(data.result));
+      setwaitingOnResponse(false);
+    } catch (error: any) {
+      // Consider implementing your own error handling logic here
+      console.error(error);
+      setwaitingOnResponse(false);
+      alert(error.message);
+    }
+  }
+
   return (
     <>
       <Head>
@@ -14,110 +84,77 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
+      <main>
+        <Container centerContent>
+          <Stack
+            my={[0, 6, 32]}
+            ml={[0, 0, -12, -32]}
+            fontFamily="mono"
+            spacing={6}
+          >
+            <Heading fontFamily={"mono"} hidden={submittedFeedback}>
+              Is this good feedback?
+            </Heading>
+            <Text hidden={submittedFeedback}>
+              Show me the feedback from a customer and I&apos;ll tell you if it
+              needs improvement to be useful.
+            </Text>
+            {submittedFeedback && response != null && (
+              <FeedbackBreakdown feedback={response} />
+            )}
+            <Input
+              ref={input}
+              w={"container.sm"}
+              autoFocus
+              placeholder="Enter the product feedback from a customer here"
+              // color={submittedFeedback ? "gray.500" : "inherit"}
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
             />
-          </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+            <Box>
+              <Button
+                onClick={handleSubmit}
+                colorScheme="green"
+                isLoading={waitingOnResponse}
+                loadingText="Loading"
+              >
+                Submit ↩️
+              </Button>
+              <Button onClick={handleReset} ml={4}>
+                Reset
+              </Button>
+            </Box>
+            {/* <Box>
+              <Button variant={"link"}>What is good product feedback?</Button>
+            </Box> */}
+          </Stack>
+        </Container>
       </main>
     </>
-  )
+  );
 }
+
+const FeedbackBreakdown = ({ feedback }: { feedback: FeedbackResponse }) => {
+  return (
+    <Stack fontFamily={"mono"}>
+      <Heading>{capitalise(feedback.category)}</Heading>
+      <Text>{feedback.description}</Text>
+      <Text fontWeight={"bold"}>Included</Text>
+      <Box>
+        <UnorderedList>
+          <ListItem>{feedback.included}</ListItem>
+        </UnorderedList>
+      </Box>
+      <Text fontWeight={"bold"}>Missing</Text>
+      <Box>
+        <UnorderedList>
+          {feedback.missing.split(",").map((m) => (
+            <ListItem key={m}>{m}</ListItem>
+          ))}
+        </UnorderedList>
+      </Box>
+    </Stack>
+  );
+};
+
+const capitalise = (s: string) => s && s[0].toUpperCase() + s.slice(1);
