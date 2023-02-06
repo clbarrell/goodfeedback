@@ -1,5 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { createClient } from "@supabase/supabase-js";
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -9,6 +10,9 @@ const openai = new OpenAIApi(configuration);
 type Data = {
   feedback: string;
 };
+
+const supabaseUrl = "https://fybqacezgsihoisssvas.supabase.co";
+const supabase = createClient(supabaseUrl, process.env.SUPABASE_KEY);
 
 export default async function handler(
   req: NextApiRequest,
@@ -41,7 +45,17 @@ export default async function handler(
       temperature: 0.62,
       max_tokens: 1000,
     });
+    // SUCCESS
     console.log("Response", completion.data.choices[0].text);
+    // Temporary: To get a sense of what kinds of things people are submitting
+    // no visitor tracking yet
+    const { data, error } = await supabase.from("feedback_submitted").insert([
+      {
+        feedback: feedback,
+        response: JSON.parse(completion.data.choices[0].text as string),
+      },
+    ]);
+
     res.status(200).json({ result: completion.data.choices[0].text });
   } catch (error: any) {
     // Consider adjusting the error handling logic for your use case
