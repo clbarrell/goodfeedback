@@ -106,12 +106,11 @@ export default function Home() {
           <Stack
             my={[4, 6, 32]}
             ml={[0, 0, -12, -32]}
-            fontFamily="mono"
             spacing={6}
             wrap="wrap"
             w="100%"
           >
-            <Heading fontFamily={"mono"} hidden={submittedFeedback}>
+            <Heading hidden={submittedFeedback}>
               Is this good product feedback?
             </Heading>
             <Text hidden={submittedFeedback}>
@@ -172,7 +171,7 @@ export default function Home() {
 
 const FeedbackBreakdown = ({ feedback }: { feedback: FeedbackResponse }) => {
   return (
-    <Stack fontFamily={"mono"}>
+    <Stack>
       <Heading>
         {capitalise(feedback.category)}
         {feedback.category.includes("good") && (
@@ -187,7 +186,7 @@ const FeedbackBreakdown = ({ feedback }: { feedback: FeedbackResponse }) => {
       </Text>
       <Box>
         <UnorderedList>
-        {feedback.included.split(",").map((m) => (
+          {feedback.included.split(",").map((m) => (
             <ListItem key={m}>{m}</ListItem>
           ))}
         </UnorderedList>

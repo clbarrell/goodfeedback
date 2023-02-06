@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import type { AppProps } from "next/app";
+import "@fontsource/spline-sans-mono";
 
 const colors = {
   brand: {
@@ -15,7 +16,16 @@ const config = {
   useSystemColorMode: false,
 };
 
-export const theme = extendTheme({ colors }, { config });
+export const theme = extendTheme(
+  { colors },
+  {
+    fonts: {
+      heading: `"Spline Sans Mono", monospace`,
+      body: `"Spline Sans Mono", monospace`,
+    },
+  },
+  { config }
+);
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
