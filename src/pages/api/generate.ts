@@ -29,6 +29,7 @@ export default async function handler(
   }
 
   const feedback = req.body.feedback || "";
+  const user = req.body.user || "";
   if (feedback.trim().length === 0) {
     res.status(400).json({
       error: {
@@ -53,6 +54,7 @@ export default async function handler(
       {
         feedback: feedback,
         response: JSON.parse(completion.data.choices[0].text as string),
+        user: user,
       },
     ]);
 

@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
+import { useLocalStorage } from "usehooks-ts";
 
 type FeedbackResponse = {
   category: string;
@@ -27,6 +28,9 @@ export default function Home() {
   const [submittedFeedback, setSubmittedFeedback] = useState(false);
   const [response, setResponse] = useState<FeedbackResponse | null>(null);
   const [waitingOnResponse, setwaitingOnResponse] = useState(false);
+
+  const newID = Date.now().toString();
+  const [browserID, setBrowserID] = useLocalStorage("browserID", newID);
 
   useEffect(() => {
     if (input.current != null) {
@@ -55,12 +59,13 @@ export default function Home() {
   async function onSubmit() {
     try {
       setwaitingOnResponse(true);
+
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ feedback: feedback }),
+        body: JSON.stringify({ feedback: feedback, user: browserID }),
       });
 
       const data = await response.json();
@@ -104,6 +109,7 @@ export default function Home() {
             fontFamily="mono"
             spacing={6}
             wrap="wrap"
+            w="100%"
           >
             <Heading fontFamily={"mono"} hidden={submittedFeedback}>
               Is this good product feedback?
@@ -118,7 +124,7 @@ export default function Home() {
             <Textarea
               ref={input}
               w={"full"}
-              rows={3}
+              rows={5}
               resize="none"
               autoFocus
               placeholder="Enter the product feedback from a customer here"
@@ -181,7 +187,9 @@ const FeedbackBreakdown = ({ feedback }: { feedback: FeedbackResponse }) => {
       </Text>
       <Box>
         <UnorderedList>
-          <ListItem>{feedback.included}</ListItem>
+        {feedback.included.split(",").map((m) => (
+            <ListItem key={m}>{m}</ListItem>
+          ))}
         </UnorderedList>
       </Box>
       <Text fontWeight={"bold"} color="orange.200">
