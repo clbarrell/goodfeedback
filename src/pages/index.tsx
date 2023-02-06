@@ -22,14 +22,14 @@ type FeedbackResponse = {
 };
 
 export default function Home() {
-  const input = useRef<HTMLInputElement>();
+  const input = useRef<HTMLTextAreaElement>(null);
   const [feedback, setFeedback] = useState("");
   const [submittedFeedback, setSubmittedFeedback] = useState(false);
   const [response, setResponse] = useState<FeedbackResponse | null>(null);
   const [waitingOnResponse, setwaitingOnResponse] = useState(false);
 
   useEffect(() => {
-    if (input.current != undefined) {
+    if (input.current != null) {
       input.current.focus();
     }
   }, []);
@@ -46,7 +46,9 @@ export default function Home() {
 
   const handleReset = () => {
     setSubmittedFeedback(false);
-    input.current.focus();
+    if (input.current != null) {
+      input.current.focus();
+    }
     setFeedback("");
   };
 
@@ -112,14 +114,20 @@ export default function Home() {
             {submittedFeedback && response != null && (
               <FeedbackBreakdown feedback={response} />
             )}
-            <Input
+            <Textarea
               ref={input}
               w={"container.sm"}
+              rows={3}
+              resize="none"
               autoFocus
               placeholder="Enter the product feedback from a customer here"
               // color={submittedFeedback ? "gray.500" : "inherit"}
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
+              bg="gray.700"
+              onKeyPress={(e) => {
+                if (e.key === "Enter") handleSubmit();
+              }}
             />
             <Box>
               <Button
@@ -138,8 +146,13 @@ export default function Home() {
             {/* <Box>
               <Button variant={"link"}>What is good product feedback?</Button>
             </Box> */}
-            <Box>
-              <Button variant={"link"} color="gray.400" onClick={useExample}>
+            <Box hidden={submittedFeedback}>
+              <Button
+                variant={"link"}
+                color="gray.400"
+                onClick={useExample}
+                fontSize="sm"
+              >
                 Show me an example
               </Button>
             </Box>
@@ -153,15 +166,26 @@ export default function Home() {
 const FeedbackBreakdown = ({ feedback }: { feedback: FeedbackResponse }) => {
   return (
     <Stack fontFamily={"mono"}>
-      <Heading>{capitalise(feedback.category)}</Heading>
+      <Heading>
+        {capitalise(feedback.category)}
+        {feedback.category.includes("good") && (
+          <Text as="span" ml="2">
+            👍
+          </Text>
+        )}
+      </Heading>
       <Text>{feedback.description}</Text>
-      <Text fontWeight={"bold"}>Included</Text>
+      <Text fontWeight={"bold"} color="green.200">
+        Included
+      </Text>
       <Box>
         <UnorderedList>
           <ListItem>{feedback.included}</ListItem>
         </UnorderedList>
       </Box>
-      <Text fontWeight={"bold"}>Missing</Text>
+      <Text fontWeight={"bold"} color="orange.200">
+        Missing
+      </Text>
       <Box>
         <UnorderedList>
           {feedback.missing.split(",").map((m) => (
