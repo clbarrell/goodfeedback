@@ -162,9 +162,16 @@ export default function Home() {
                 Show me an example
               </Button>
             </Box>
+            <Box display={["block", "none"]}>
+              {" "}
+              <Text color="gray.400" fontSize={"sm"}>
+                Made by Chris Barrell
+              </Text>{" "}
+            </Box>
           </Stack>
         </Container>
       </main>
+      <Footer />
     </>
   );
 }
@@ -206,3 +213,24 @@ const FeedbackBreakdown = ({ feedback }: { feedback: FeedbackResponse }) => {
 };
 
 const capitalise = (s: string) => s && s[0].toUpperCase() + s.slice(1);
+
+const Footer = () => {
+  return (
+    <Box
+      position={"fixed"}
+      bottom={0}
+      left={0}
+      right={0}
+      w="100%"
+      h={12}
+      display={["none", "block"]}
+    >
+      <Container>
+        <Text ml={[0, 0, -8, -32]} color="gray.400" fontSize={"sm"}>
+          {" "}
+          Made by Chris Barrell
+        </Text>
+      </Container>
+    </Box>
+  );
+};
