@@ -99,10 +99,11 @@ export default function Home() {
       <main>
         <Container centerContent>
           <Stack
-            my={[0, 6, 32]}
+            my={[4, 6, 32]}
             ml={[0, 0, -12, -32]}
             fontFamily="mono"
             spacing={6}
+            wrap="wrap"
           >
             <Heading fontFamily={"mono"} hidden={submittedFeedback}>
               Is this good product feedback?
@@ -116,7 +117,7 @@ export default function Home() {
             )}
             <Textarea
               ref={input}
-              w={"container.sm"}
+              w={"full"}
               rows={3}
               resize="none"
               autoFocus
