@@ -227,7 +227,6 @@ const Footer = () => {
     >
       <Container>
         <Text ml={[0, 0, -8, -32]} color="gray.400" fontSize={"sm"}>
-          {" "}
           Made by Chris Barrell
         </Text>
       </Container>
