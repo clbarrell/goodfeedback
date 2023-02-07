@@ -1,3 +1,4 @@
+import { getBrowserID } from "@/lib/setBrowserID";
 import {
   Box,
   Button,
@@ -28,9 +29,6 @@ export default function Home() {
   const [submittedFeedback, setSubmittedFeedback] = useState(false);
   const [response, setResponse] = useState<FeedbackResponse | null>(null);
   const [waitingOnResponse, setwaitingOnResponse] = useState(false);
-
-  const newID = Date.now().toString();
-  const [browserID, setBrowserID] = useLocalStorage("browserID", newID);
 
   useEffect(() => {
     if (input.current != null) {
@@ -65,7 +63,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ feedback: feedback, user: browserID }),
+        body: JSON.stringify({ feedback: feedback, user: getBrowserID() }),
       });
 
       const data = await response.json();
